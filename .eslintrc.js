@@ -13,5 +13,8 @@ module.exports = {
     ],
     'prettier/prettier': 'off',
     quotes: 'off',
+    semi: 'off',
+    'no-trailing-spaces': 'off',
+    'eol-last': 'off',
   },
 };
