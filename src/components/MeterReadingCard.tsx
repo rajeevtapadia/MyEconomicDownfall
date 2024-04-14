@@ -4,14 +4,28 @@ import DateTimePicker, {
 import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
+import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {recordReading} from '../database/crud';
 
-interface Props {}
+interface Props {
+  db: SQLiteDatabase;
+}
 
-function MeterReadingCard(props: Props) {
+function MeterReadingCard({db}: Props) {
   const [reading, setReading] = useState<number | null>(null);
   const [date, setDate] = useState<Date | null>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  console.log(date);
+
+  const onSubmit = () => {
+    if (!reading || !date) {
+      return;
+    }
+    try {
+      recordReading(db, reading, date);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const onChangeDate = (
     event: DateTimePickerEvent,
@@ -32,6 +46,9 @@ function MeterReadingCard(props: Props) {
           textColor="white"
           keyboardType="numeric"
           style={styles.reading}
+          onChangeText={text => {
+            setReading(+text);
+          }}
         />
 
         <TextInput
@@ -53,7 +70,7 @@ function MeterReadingCard(props: Props) {
           />
         )}
       </View>
-      <Button mode="contained-tonal" style={styles.button}>
+      <Button mode="contained-tonal" style={styles.button} onPress={onSubmit}>
         Save
       </Button>
     </View>

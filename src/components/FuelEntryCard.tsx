@@ -4,22 +4,39 @@ import DateTimePicker, {
 import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
+import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {fillFuelEntry} from '../database/crud';
 
-interface Props {}
+interface Props {
+  db: SQLiteDatabase;
+}
 
-function FuelEntryCard(props: Props) {
+function FuelEntryCard({db}: Props) {
   const [quantity, setQuantity] = useState<number | null>(null);
   const [date, setDate] = useState<Date | null>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const onSubmit = () => {
+    if (!quantity || !date) {
+      return;
+    }
+    try {
+      fillFuelEntry(db, quantity, date);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const onChangeDate = (
     event: DateTimePickerEvent,
     selectedDate: Date | undefined,
   ) => {
     const currentDate = selectedDate || date;
+    console.log(currentDate);
     setShowDatePicker(false);
     setDate(currentDate);
   };
+  // console.log(date);
 
   return (
     <View style={styles.container}>
@@ -31,6 +48,9 @@ function FuelEntryCard(props: Props) {
           textColor="white"
           keyboardType="numeric"
           style={styles.quantity}
+          onChangeText={text => {
+            setQuantity(+text);
+          }}
         />
 
         <TextInput
@@ -52,7 +72,7 @@ function FuelEntryCard(props: Props) {
           />
         )}
       </View>
-      <Button mode="contained-tonal" style={styles.button}>
+      <Button mode="contained-tonal" style={styles.button} onPress={onSubmit}>
         Save
       </Button>
     </View>
