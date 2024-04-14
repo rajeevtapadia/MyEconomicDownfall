@@ -31,9 +31,7 @@ export const createTables = async db => {
         CREATE TABLE IF NOT EXISTS Reading (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           meterReading REAL,
-          date DATE,
-          userId TEXT,
-          FOREIGN KEY (userId) REFERENCES User(id)
+          date DATE
         )
       `);
 
@@ -41,18 +39,43 @@ export const createTables = async db => {
         CREATE TABLE IF NOT EXISTS FuelQuantity (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           quantity REAL,
-          date DATE,
-          userId TEXT,
-          FOREIGN KEY (userId) REFERENCES User(id)
+          date DATE
         )
       `);
+    // userId TEXT,
+    // FOREIGN KEY (userId) REFERENCES User(id)
   } catch (error) {
     console.error(error);
     throw Error(`Failed to create tables`);
   }
 };
 
-async function test(db) {
+export async function printUser(db) {
   const res = await db.executeSql('select * from User');
-  console.log(JSON.stringify(res[0].rows.raw(), undefined, 2));
+  console.log('user', JSON.stringify(res[0].rows.raw(), undefined, 2));
+}
+
+export async function allReading(db) {
+  if (!db) {
+    console.log('db is null');
+    return;
+  }
+  const res = await db.executeSql('select * from Reading');
+  console.log('reading', JSON.stringify(res[0].rows.raw(), undefined, 2));
+}
+
+export async function allFuelEntries(db) {
+  if (!db) {
+    return;
+  }
+  const res = await db.executeSql('select * from FuelQuantity');
+  console.log('fuel entries', JSON.stringify(res[0].rows.raw(), undefined, 2));
+}
+
+export async function clearDatabase(db) {
+  if (!db) {
+    return;
+  }
+  db.executeSql('drop table Reading;');
+  db.executeSql('drop table FuelQuantity;');
 }
