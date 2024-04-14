@@ -1,14 +1,22 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {SafeAreaView, Text, View, useColorScheme} from 'react-native';
-import {PaperProvider, DefaultTheme} from 'react-native-paper';
-import {connectToDatabase, createTables} from './src/database/database';
+import {SafeAreaView, Text, View} from 'react-native';
+import {DefaultTheme, PaperProvider} from 'react-native-paper';
 import FuelEntryCard from './src/components/FuelEntryCard';
-import NavBar from './src/components/NavBar';
 import MeterReadingCard from './src/components/MeterReadingCard';
+import NavBar from './src/components/NavBar';
+import StatsCard from './src/components/StatsCard';
+import {
+  allFuelEntries,
+  allReading,
+  clearDatabase,
+  connectToDatabase,
+  createTables,
+} from './src/database/database';
 import global from './src/styles/global';
+import {SQLiteDatabase} from 'react-native-sqlite-storage';
 
 function App() {
-  const [db, setDb] = useState(null);
+  const [db, setDb] = useState<SQLiteDatabase | null>(null);
   const darkTheme = {
     ...DefaultTheme,
     colors: {
@@ -32,14 +40,25 @@ function App() {
     connectDB();
   }, [connectDB]);
 
+  allFuelEntries(db);
+  allReading(db);
+  // clearDatabase(db);
+
   return (
     <PaperProvider theme={darkTheme}>
       <SafeAreaView>
-        <View style={global.window}>
-          <NavBar title="Dashboard" />
-          <FuelEntryCard />
-          <MeterReadingCard />
-        </View>
+        {db ? (
+          <View style={global.window}>
+            <NavBar title="Dashboard" />
+            <StatsCard db={db} />
+            <View>
+              <FuelEntryCard db={db} />
+              <MeterReadingCard db={db} />
+            </View>
+          </View>
+        ) : (
+          <Text>Error Cant Connect to Database</Text>
+        )}
       </SafeAreaView>
     </PaperProvider>
   );
