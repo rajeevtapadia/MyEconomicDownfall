@@ -1,22 +1,23 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {SafeAreaView, Text, View} from 'react-native';
-import {DefaultTheme, PaperProvider} from 'react-native-paper';
-import FuelEntryCard from './src/components/FuelEntryCard';
-import MeterReadingCard from './src/components/MeterReadingCard';
-import NavBar from './src/components/NavBar';
-import StatsCard from './src/components/StatsCard';
+import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
+import {DefaultTheme, PaperProvider, Snackbar} from 'react-native-paper';
+import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {NavigationContainer} from '@react-navigation/native';
 import {
   allFuelEntries,
   allReading,
-  clearDatabase,
   connectToDatabase,
   createTables,
 } from './src/database/database';
 import global from './src/styles/global';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import Dashboard from './src/screens/Dashboard';
+
+const Stack = createNativeStackNavigator();
 
 function App() {
   const [db, setDb] = useState<SQLiteDatabase | null>(null);
+
   const darkTheme = {
     ...DefaultTheme,
     colors: {
@@ -40,25 +41,29 @@ function App() {
     connectDB();
   }, [connectDB]);
 
-  allFuelEntries(db);
-  allReading(db);
+  // allFuelEntries(db);
+  // allReading(db);
   // clearDatabase(db);
 
   return (
     <PaperProvider theme={darkTheme}>
       <SafeAreaView>
-        {db ? (
-          <View style={global.window}>
-            <NavBar title="Dashboard" />
-            <StatsCard db={db} />
-            <View>
-              <FuelEntryCard db={db} />
-              <MeterReadingCard db={db} />
-            </View>
-          </View>
-        ) : (
-          <Text>Error Cant Connect to Database</Text>
-        )}
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="dashboard">
+            <Stack.Screen
+              name="dashboard"
+              component={Dashboard}
+              initialParams={{db}}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+        {/* <View style={global.window}>
+          {db ? (
+            <Dashboard db={db} />
+          ) : (
+            <Text>Error Cant Connect to Database</Text>
+          )}
+        </View> */}
       </SafeAreaView>
     </PaperProvider>
   );
