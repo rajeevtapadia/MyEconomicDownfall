@@ -1,17 +1,11 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
-import {DefaultTheme, PaperProvider, Snackbar} from 'react-native-paper';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
-import {
-  allFuelEntries,
-  allReading,
-  connectToDatabase,
-  createTables,
-} from './src/database/database';
-import global from './src/styles/global';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React, {useCallback, useEffect, useState} from 'react';
+import {DefaultTheme, PaperProvider} from 'react-native-paper';
+import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {connectToDatabase, createTables} from './src/database/database';
 import Dashboard from './src/screens/Dashboard';
+import RecordScreen from './src/screens/RecordScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -47,24 +41,14 @@ function App() {
 
   return (
     <PaperProvider theme={darkTheme}>
-      <SafeAreaView>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="dashboard">
-            <Stack.Screen
-              name="dashboard"
-              component={Dashboard}
-              initialParams={{db}}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-        {/* <View style={global.window}>
-          {db ? (
-            <Dashboard db={db} />
-          ) : (
-            <Text>Error Cant Connect to Database</Text>
-          )}
-        </View> */}
-      </SafeAreaView>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="records"
+          screenOptions={{headerShown: false}}>
+          <Stack.Screen name="dashboard" component={Dashboard} />
+          <Stack.Screen name="records" component={RecordScreen}></Stack.Screen>
+        </Stack.Navigator>
+      </NavigationContainer>
     </PaperProvider>
   );
 }
