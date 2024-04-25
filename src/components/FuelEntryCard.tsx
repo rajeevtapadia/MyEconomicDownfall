@@ -32,11 +32,9 @@ function FuelEntryCard({db}: Props) {
     selectedDate: Date | undefined,
   ) => {
     const currentDate = selectedDate || date;
-    console.log(currentDate);
     setShowDatePicker(false);
     setDate(currentDate);
   };
-  // console.log(date);
 
   return (
     <View style={styles.container}>

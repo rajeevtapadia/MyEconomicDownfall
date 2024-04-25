@@ -57,10 +57,9 @@ export async function printUser(db) {
 
 export async function allReading(db) {
   if (!db) {
-    console.log('db is null');
     return;
   }
-  const res = await db.executeSql('select * from Reading');
+  const res = await db.executeSql('select * from Reading ORDER BY date DESC');
   console.log('reading', JSON.stringify(res[0].rows.raw(), undefined, 2));
 }
 
@@ -68,7 +67,9 @@ export async function allFuelEntries(db) {
   if (!db) {
     return;
   }
-  const res = await db.executeSql('select * from FuelQuantity');
+  const res = await db.executeSql(
+    'select * from FuelQuantity ORDER BY date DESC',
+  );
   console.log('fuel entries', JSON.stringify(res[0].rows.raw(), undefined, 2));
 }
 
