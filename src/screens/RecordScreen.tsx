@@ -1,14 +1,14 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Text, View} from 'react-native';
 import {SQLiteDatabase} from 'react-native-sqlite-storage';
-import {connectToDatabase, createTables} from '../database/database';
-import TableRow from '../components/TableRow';
 import NavBar from '../components/NavBar';
+import TableRow from '../components/TableRow';
+import {connectToDatabase, createTables} from '../database/database';
 
 const RecordScreen = () => {
   const [db, setDb] = useState<SQLiteDatabase | null>(null);
-  const [readings, setReadings] = useState<Array<Object>>([]);
-  const [quantity, setQuantity] = useState<Array<Object>>([]);
+  const [readings, setReadings] = useState<Reading[]>([]);
+  const [quantity, setQuantity] = useState<Quantity[]>([]);
 
   const connectDB = useCallback(async () => {
     const connection = await connectToDatabase();
@@ -27,15 +27,11 @@ const RecordScreen = () => {
         const [readingData] = await db.executeSql(
           `select * from Reading ORDER BY date DESC`,
         );
-        // console.log(JSON.stringify({reading: readingData.rows.raw()}, null, 2));
         setReadings(readingData.rows.raw());
 
         const [quantityData] = await db.executeSql(
           `select * from FuelQuantity ORDER BY date DESC`,
         );
-        // console.log(
-        //   JSON.stringify({quantity: quantityData.rows.raw()}, null, 2),
-        // );
         setQuantity(quantityData.rows.raw());
       }
     }

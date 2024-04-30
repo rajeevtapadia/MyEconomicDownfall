@@ -1,16 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
 
 interface props {
-  readings: Array<Object>;
-  quantity: Array<Object>;
+  readings: Reading[];
+  quantity: Quantity[];
   index: number;
 }
 
 const TableRow = ({readings, quantity, index}: props) => {
-  const [prevReading, setPrevReading] = useState<Object>({date: new Date(0)});
-  const [fills, setFills] = useState<Array<Object>>([]);
+  const [prevReading, setPrevReading] = useState<string>(
+    new Date(0).toISOString(),
+  );
+  const [fills, setFills] = useState<Quantity[]>([]);
+
+  console.log({prevReading});
 
   // effect to find prevReading
   useEffect(() => {
@@ -19,20 +23,18 @@ const TableRow = ({readings, quantity, index}: props) => {
     if (index === readings.length - 1) {
       // TODO: set prevReading to initReading in User Obj
     } else {
-      setPrevReading(readings[index + 1]);
+      setPrevReading(readings[index + 1].date);
     }
   }, [index, readings]);
 
   // effect for getting the fills in required range
   useEffect(() => {
     const requiredRec = [];
-    const start = prevReading.date;
     const end = readings[index].date;
-    // console.log({prev: prevReading.date, curr: readings[index].date});
 
     // brute force go brr
     for (let i = quantity.length - 1; i >= 0; i--) {
-      if (quantity[i].date <= end && quantity[i].date >= start) {
+      if (quantity[i].date <= end && quantity[i].date >= prevReading) {
         requiredRec.push(quantity[i]);
       }
     }

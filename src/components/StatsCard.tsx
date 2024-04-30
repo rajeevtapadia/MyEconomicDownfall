@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Card, DefaultTheme, Paragraph, Text, Title} from 'react-native-paper';
-import {calcLatestFillAvg, calcOverallAvg} from '../utils/math';
 import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {calcLatestFillAvg, calcOverallAvg} from '../utils/math';
 
 interface Props {
   db: SQLiteDatabase;
@@ -11,7 +11,6 @@ interface Props {
 const StatsCard = ({db}: Props) => {
   const [latestAvg, setLatestAvg] = useState<number>(NaN);
   const [overallAvg, setOverallAvg] = useState<number>(NaN);
-  
 
   useEffect(() => {
     async function setValues() {

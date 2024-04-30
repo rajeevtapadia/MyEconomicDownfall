@@ -1,13 +1,13 @@
-import React, {useState, useCallback, useEffect} from 'react';
-import {View, StyleSheet} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {Snackbar, Text} from 'react-native-paper';
 import {SQLiteDatabase} from 'react-native-sqlite-storage';
 import FuelEntryCard from '../components/FuelEntryCard';
 import MeterReadingCard from '../components/MeterReadingCard';
 import NavBar from '../components/NavBar';
 import StatsCard from '../components/StatsCard';
-import global from '../styles/global';
 import {connectToDatabase, createTables} from '../database/database';
+import global from '../styles/global';
 
 const Dashboard = () => {
   const [snackbar, setSnackbar] = useState<boolean>(true);
