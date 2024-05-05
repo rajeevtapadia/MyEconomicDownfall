@@ -6,6 +6,7 @@ import {SQLiteDatabase} from 'react-native-sqlite-storage';
 import {connectToDatabase, createTables} from './src/database/database';
 import Dashboard from './src/screens/Dashboard';
 import RecordScreen from './src/screens/RecordScreen';
+import Settings from './src/screens/Settings';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,10 +44,11 @@ function App() {
     <PaperProvider theme={darkTheme}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="records"
+          initialRouteName="dashboard"
           screenOptions={{headerShown: false}}>
           <Stack.Screen name="dashboard" component={Dashboard} />
           <Stack.Screen name="records" component={RecordScreen}></Stack.Screen>
+          <Stack.Screen name="settings" component={Settings}></Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>
