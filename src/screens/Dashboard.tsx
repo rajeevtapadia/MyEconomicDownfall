@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Snackbar, Text} from 'react-native-paper';
+import {Snackbar, Text, Button} from 'react-native-paper';
 import {SQLiteDatabase} from 'react-native-sqlite-storage';
 import FuelEntryCard from '../components/FuelEntryCard';
 import MeterReadingCard from '../components/MeterReadingCard';
@@ -8,8 +8,13 @@ import NavBar from '../components/NavBar';
 import StatsCard from '../components/StatsCard';
 import {connectToDatabase, createTables} from '../database/database';
 import global from '../styles/global';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
-const Dashboard = () => {
+interface props {
+  navigation: NativeStackNavigationProp<any, any>;
+}
+
+const Dashboard = ({navigation}: props) => {
   const [snackbar, setSnackbar] = useState<boolean>(true);
   const [snackbarMsg, setSnackbarMsg] = useState<string>(
     'jghkhjghjghjglhjlfg hg ',
@@ -33,14 +38,21 @@ const Dashboard = () => {
   return (
     <View style={global.window}>
       <View>
-        <NavBar title="Dashboard" />
+        <NavBar title="Dashboard" navigation={navigation} />
         <StatsCard db={db} />
         <View>
           <FuelEntryCard db={db} />
           <MeterReadingCard db={db} />
         </View>
       </View>
-      <View style={styles.snackbarContainer}>
+      <Button
+        mode="contained-tonal"
+        onPress={() => {
+          navigation.navigate('records');
+        }}>
+        History
+      </Button>
+      {/* <View style={styles.snackbarContainer}>
         <Snackbar
           visible={snackbar}
           onDismiss={() => {
@@ -49,7 +61,7 @@ const Dashboard = () => {
           }}>
           {snackbarMsg}
         </Snackbar>
-      </View>
+      </View> */}
     </View>
   );
 };
