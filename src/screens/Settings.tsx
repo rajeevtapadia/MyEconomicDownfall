@@ -24,6 +24,22 @@ const Settings = () => {
     connectDB();
   }, [connectDB]);
 
+  // effect to prefill user data if already exist
+  useEffect(() => {
+    async function getUserData() {
+      if (db) {
+        const [userData] = await db.executeSql(`SELECT * FROM User`);
+        const user = userData.rows.raw();
+        if (user.length > 0) {
+          setName(user[0].name);
+          setInitReading(user[0].initReading);
+          setPrice(user[0].price);
+        }
+      }
+    }
+    getUserData();
+  }, [db]);
+
   if (!db) {
     return <Text>Db not connected...</Text>;
   }
@@ -48,6 +64,7 @@ const Settings = () => {
             label="Name"
             mode="outlined"
             textColor="white"
+            value={name}
             style={styles.quantity}
             onChangeText={text => {
               setName(text);
@@ -57,6 +74,7 @@ const Settings = () => {
             label="Initial Reading"
             mode="outlined"
             textColor="white"
+            value={initReading ? initReading.toString() : undefined}
             keyboardType="numeric"
             style={styles.quantity}
             onChangeText={text => {
@@ -67,6 +85,7 @@ const Settings = () => {
             label="Price"
             mode="outlined"
             textColor="white"
+            value={price ? price.toString() : undefined}
             keyboardType="numeric"
             style={styles.quantity}
             onChangeText={text => {
