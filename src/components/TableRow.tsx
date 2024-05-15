@@ -1,18 +1,21 @@
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
+import global from '../styles/global';
 
 interface props {
   readings: Reading[];
   quantity: Quantity[];
   index: number;
+  user: User;
 }
 
-const TableRow = ({readings, quantity, index}: props) => {
+const TableRow = ({readings, quantity, index, user}: props) => {
   const [prevReading, setPrevReading] = useState<string>(
     new Date(0).toISOString(),
   );
   const [fills, setFills] = useState<Quantity[]>([]);
+  const [run, setRun] = useState<number>(NaN);
 
   console.log({prevReading});
 
@@ -22,10 +25,12 @@ const TableRow = ({readings, quantity, index}: props) => {
     // ie index + 1 doesn't exits
     if (index === readings.length - 1) {
       // TODO: set prevReading to initReading in User Obj
+      setRun(readings[index].meterReading - user.initReading);
     } else {
       setPrevReading(readings[index + 1].date);
+      setRun(readings[index].meterReading - readings[index + 1].meterReading);
     }
-  }, [index, readings]);
+  }, [index, readings, user]);
 
   // effect for getting the fills in required range
   useEffect(() => {
@@ -45,17 +50,17 @@ const TableRow = ({readings, quantity, index}: props) => {
   return (
     <View style={styles.container}>
       <View>
-        <Text>{readings[index].meterReading} ₹</Text>
-        <Text>{readings[index].date.split('T')[0]}</Text>
-      </View>
-      <View>
         {fills.map((fill, i) => (
           <View key={i}>
-            <Text>
+            <Text style={styles.text}>
               {fill.quantity} L - {fill.date.split('T')[0]}
             </Text>
           </View>
         ))}
+      </View>
+      <View>
+        <Text style={styles.text}>{run} km</Text>
+        <Text style={styles.text}>{readings[index].date.split('T')[0]}</Text>
       </View>
     </View>
   );
@@ -69,6 +74,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     display: 'flex',
     justifyContent: 'space-around',
+  },
+  text: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 

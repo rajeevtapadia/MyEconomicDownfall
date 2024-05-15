@@ -9,3 +9,10 @@ interface Quantity {
   quantity: number;
   date: string;
 }
+
+interface User {
+  id?: string;
+  name?: string;
+  initReading?: number;
+  price?: number;
+}
