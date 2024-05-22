@@ -7,6 +7,7 @@ import {connectToDatabase, createTables} from './src/database/database';
 import Dashboard from './src/screens/Dashboard';
 import RecordScreen from './src/screens/RecordScreen';
 import Settings from './src/screens/Settings';
+import {requestPermissions} from './src/utils/permissions';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,9 +28,14 @@ function App() {
   };
 
   const connectDB = useCallback(async () => {
-    const connection = await connectToDatabase();
-    setDb(connection);
-    createTables(connection);
+    requestPermissions();
+    try {
+      const connection = await connectToDatabase();
+      setDb(connection);
+      createTables(connection);
+    } catch (e) {
+      console.log('not connected to db');
+    }
   }, []);
 
   useEffect(() => {
