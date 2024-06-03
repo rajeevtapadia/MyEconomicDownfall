@@ -4,7 +4,7 @@ import {Text} from 'react-native-paper';
 import {SQLiteDatabase} from 'react-native-sqlite-storage';
 import NavBar from '../components/NavBar';
 import TableRow from '../components/TableRow';
-import {connectToDatabase, createTables} from '../database/database';
+import {connectToDatabase} from '../database/database';
 
 const RecordScreen = () => {
   const [db, setDb] = useState<SQLiteDatabase | null>(null);
@@ -15,7 +15,6 @@ const RecordScreen = () => {
   const connectDB = useCallback(async () => {
     const connection = await connectToDatabase();
     setDb(connection);
-    createTables(connection);
   }, []);
 
   useEffect(() => {

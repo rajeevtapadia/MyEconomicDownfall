@@ -6,7 +6,7 @@ import FuelEntryCard from '../components/FuelEntryCard';
 import MeterReadingCard from '../components/MeterReadingCard';
 import NavBar from '../components/NavBar';
 import StatsCard from '../components/StatsCard';
-import {connectToDatabase, createTables} from '../database/database';
+import {connectToDatabase} from '../database/database';
 import global from '../styles/global';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
@@ -24,7 +24,6 @@ const Dashboard = ({navigation}: props) => {
   const connectDB = useCallback(async () => {
     const connection = await connectToDatabase();
     setDb(connection);
-    createTables(connection);
   }, []);
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import {Button, Text, TextInput} from 'react-native-paper';
 import {SQLiteDatabase} from 'react-native-sqlite-storage';
 import NavBar from '../components/NavBar';
 import {saveUserInfo} from '../database/crud';
-import {connectToDatabase, createTables} from '../database/database';
+import {connectToDatabase} from '../database/database';
 import global from '../styles/global';
 
 const Settings = () => {
@@ -17,7 +17,6 @@ const Settings = () => {
   const connectDB = useCallback(async () => {
     const connection = await connectToDatabase();
     setDb(connection);
-    createTables(connection);
   }, []);
 
   useEffect(() => {

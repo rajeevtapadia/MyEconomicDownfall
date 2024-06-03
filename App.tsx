@@ -1,7 +1,7 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React, {useCallback, useEffect, useState} from 'react';
-import {DefaultTheme, PaperProvider} from 'react-native-paper';
+import React, {useEffect, useState} from 'react';
+import {DefaultTheme, PaperProvider, Text} from 'react-native-paper';
 import {SQLiteDatabase} from 'react-native-sqlite-storage';
 import {connectToDatabase, createTables} from './src/database/database';
 import Dashboard from './src/screens/Dashboard';
@@ -26,15 +26,18 @@ function App() {
     roundness: 4, // Adjust corner radius if needed
   };
 
-  const connectDB = useCallback(async () => {
-    const connection = await connectToDatabase();
-    setDb(connection);
-    createTables(connection);
+  useEffect(() => {
+    const connectDB = async () => {
+      const connection = await connectToDatabase();
+      createTables(connection);
+      setDb(connection);
+    };
+    connectDB();
   }, []);
 
-  useEffect(() => {
-    connectDB();
-  }, [connectDB]);
+  if (!db) {
+    return <Text>cannot connect to database</Text>;
+  }
 
   // allFuelEntries(db);
   // allReading(db);

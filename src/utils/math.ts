@@ -27,7 +27,6 @@ export async function calcOverallAvg(db: SQLiteDatabase) {
       }
     }, 0);
 
-    console.log(latestReading);
     const totalDistance =
       (latestReading.meterReading - user.initReading) / totalFill;
 
@@ -46,7 +45,6 @@ export async function calcLatestFillAvg(db: SQLiteDatabase): Promise<number> {
     `);
 
     const readingData = readingQuery.rows.raw();
-    console.log(readingData);
     let secondLastR;
     if (readingData.length < 1) {
       return NaN;
@@ -62,7 +60,6 @@ export async function calcLatestFillAvg(db: SQLiteDatabase): Promise<number> {
     let lastReading = readingData[0];
 
     const lastFill = await calcFillTill(db, secondLastR.date, lastReading.date);
-    console.log({lastFill});
     const latestFillAvg =
       (lastReading.meterReading - secondLastR.meterReading) / lastFill;
 
@@ -85,7 +82,6 @@ export async function calcFillTill(
     `);
 
     const fuelData = fuelQuery.rows.raw();
-    console.log({fuelData});
     let sum = 0;
     for (let i = 0; i < fuelData.length; i++) {
       let currentDate = new Date(fuelData[i].date);
@@ -96,7 +92,6 @@ export async function calcFillTill(
       }
     }
 
-    console.log({sum, start, end});
     return sum;
   } catch (e) {
     console.error('error in calcFillTill function', e);
