@@ -5,7 +5,7 @@ import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2'
-import {fillFuelEntry} from '../database/crud';
+import {fillFuelEntry} from '../database/insert-queries';
 
 interface Props {
   db: WebsqlDatabase;
