@@ -1,31 +1,29 @@
-import {WebsqlDatabase} from 'react-native-sqlite-2'
+import {WebsqlDatabase} from 'react-native-sqlite-2';
+import {
+  getFuelQuantityFromDB,
+  getReadingsFromDB,
+  getUserFromDB,
+} from '../database/read-queries';
 
-export async function calcOverallAvg(db: WebsqlDatabase) {
+export async function calcOverallAvg(db: WebsqlDatabase): Promise<number> {
   try {
-    const [fuelQuery] = await db.executeSql(
-      `SELECT * FROM FuelQuantity ORDER BY date DESC;`,
-    );
-
-    const [readingQuery] = await db.executeSql(
-      `SELECT * FROM Reading ORDER BY date DESC;`,
-    );
-
-    const [userQuery] = await db.executeSql(`SELECT * FROM User`);
-    const user = userQuery.rows.raw()[0];
-
-    const readingData = readingQuery.rows.raw();
+    const readingData = await getReadingsFromDB(db);
     if (readingData.length < 1) {
       return NaN;
     }
-    const latestReading = readingData[0];
+    const latestReading = readingData.item(0);
 
-    const totalFill = fuelQuery.rows.raw().reduce((prev, curr) => {
+    const fuelData = await getFuelQuantityFromDB(db);
+    let totalFill = 0;
+    for (let i = 0; i < fuelData.length; i++) {
+      let curr = fuelData.item(i);
+      // this condition skips adding the fills that are added after latestReading entry
       if (curr.date < latestReading.date) {
-        return prev + curr.quantity;
-      } else {
-        return prev;
+        totalFill += curr.quantity;
       }
-    }, 0);
+    }
+
+    const user = (await getUserFromDB(db)).item(0);
 
     const totalDistance =
       (latestReading.meterReading - user.initReading) / totalFill;
@@ -38,28 +36,32 @@ export async function calcOverallAvg(db: WebsqlDatabase) {
 }
 
 // calculates the most recent fill's avg
-export async function calcLatestFillAvg(db: WebsqlDatabase): Promise<number> {
+export async function calcLatestFillAvg(db: WebsqlDatabase) {
   try {
-    const [readingQuery] = await db.executeSql(`
-      SELECT * FROM Reading ORDER BY date DESC;
-    `);
+    const readingData = await getReadingsFromDB(db);
 
-    const readingData = readingQuery.rows.raw();
     let secondLastR;
+    // if no reading entry is in the table
     if (readingData.length < 1) {
       return NaN;
     } else if (readingData.length < 2) {
-      const [userQuery] = await db.executeSql(`
-        SELECT initReading from User WHERE id=1
-      `);
-      const userData = userQuery.rows.raw();
-      secondLastR = {meterReading: userData[0].initReading, date: new Date(0)};
+      // if there is a single reading entry in the table
+      const userData = await getUserFromDB(db);
+      secondLastR = {
+        meterReading: userData.item(0).initReading,
+        date: new Date(0),
+      };
     } else {
-      secondLastR = readingData[1];
+      // if there are two or more reading entries in the table
+      secondLastR = readingData.item(1);
     }
-    let lastReading = readingData[0];
+    let lastReading = readingData.item(0);
 
-    const lastFill = await calcFillTill(db, secondLastR.date, lastReading.date);
+    const lastFill = await calcFillInInterval(
+      db,
+      secondLastR.date,
+      lastReading.date,
+    );
     const latestFillAvg =
       (lastReading.meterReading - secondLastR.meterReading) / lastFill;
 
@@ -71,24 +73,20 @@ export async function calcLatestFillAvg(db: WebsqlDatabase): Promise<number> {
 }
 
 // calculates fuel consumption between a range of date
-export async function calcFillTill(
+export async function calcFillInInterval(
   db: WebsqlDatabase,
   start: string,
   end: string,
 ): Promise<number> {
   try {
-    const [fuelQuery] = await db.executeSql(`
-      SELECT * FROM FuelQuantity ORDER BY date DESC;
-    `);
-
-    const fuelData = fuelQuery.rows.raw();
+    const fuelData = await getFuelQuantityFromDB(db);
     let sum = 0;
     for (let i = 0; i < fuelData.length; i++) {
-      let currentDate = new Date(fuelData[i].date);
+      let currentDate = new Date(fuelData.item(i).date);
       let startDate = new Date(start);
       let endDate = new Date(end);
       if (currentDate <= endDate && currentDate >= startDate) {
-        sum += fuelData[i].quantity;
+        sum += fuelData.item(i).quantity;
       }
     }
 
