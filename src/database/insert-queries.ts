@@ -1,4 +1,5 @@
-import {WebsqlDatabase} from 'react-native-sqlite-2'
+import {WebsqlDatabase} from 'react-native-sqlite-2';
+import {getUserFromDB} from './read-queries';
 
 // these function may throw a error so handle them upon calling
 
@@ -8,13 +9,15 @@ export async function fillFuelEntry(
   date: Date,
 ) {
   try {
-    await db.executeSql(
-      `
+    db.transaction(txn => {
+      txn.executeSql(
+        `
         INSERT INTO FuelQuantity (quantity, date)
         VALUES (?, ?)
       `,
-      [quantity, date.toISOString()],
-    );
+        [quantity, date.toISOString()],
+      );
+    });
   } catch (error) {
     throw error;
   }
@@ -26,13 +29,15 @@ export async function recordReading(
   date: Date,
 ) {
   try {
-    await db.executeSql(
-      `
+    db.transaction(txn => {
+      txn.executeSql(
+        `
         INSERT INTO Reading (meterReading, date)
         VALUES (?, ?)
       `,
-      [reading, date.toISOString()],
-    );
+        [reading, date.toISOString()],
+      );
+    });
   } catch (error) {
     throw error;
   }
@@ -45,29 +50,34 @@ export async function saveUserInfo(
   price: number,
 ) {
   try {
-    const [result] = await db.executeSql(
-      `SELECT COUNT(*) AS count FROM User WHERE id = 1`,
-    );
-    const count = result.rows.item(0).count;
-
-    if (count === 0) {
-      // User doesn't exist, insert new user
-      await db.executeSql(
-        `INSERT INTO User (id, name, initReading, price) 
+    const count = await (await getUserFromDB(db)).length;
+    db.transaction(async txn => {
+      if (count === 0) {
+        // User doesn't exist, insert new user
+        txn.executeSql(
+          `INSERT INTO User (id, name, initReading, price) 
         VALUES (?, ?, ?, ?)`,
-        [1, name, initReading, price],
-      );
-    } else {
-      // User exists, update user
-      await db.executeSql(
-        `
+          [1, name, initReading, price],
+          (tx, result) => console.log('user inserted'),
+          (tx, err) => {
+            console.log(err);
+            return false;
+          },
+        );
+        console.log('gg');
+      } else {
+        // User exists, update user
+
+        txn.executeSql(
+          `
         UPDATE User 
         SET name = ?, initReading = ?, price = ?
         WHERE id = ?
       `,
-        [name, initReading, price, 1],
-      );
-    }
+          [name, initReading, price, 1],
+        );
+      }
+    });
   } catch (error) {
     throw error;
   }
