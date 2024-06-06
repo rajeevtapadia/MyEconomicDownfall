@@ -1,13 +1,13 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {WebsqlDatabase} from 'react-native-sqlite-2'
 import NavBar from '../components/NavBar';
 import TableRow from '../components/TableRow';
 import {connectToDatabase} from '../database/database';
 
 const RecordScreen = () => {
-  const [db, setDb] = useState<SQLiteDatabase | null>(null);
+  const [db, setDb] = useState<WebsqlDatabase | null>(null);
   const [readings, setReadings] = useState<Reading[]>([]);
   const [quantity, setQuantity] = useState<Quantity[]>([]);
   const [user, setUser] = useState<User>({});

@@ -1,9 +1,9 @@
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {WebsqlDatabase} from 'react-native-sqlite-2'
 
 // these function may throw a error so handle them upon calling
 
 export async function fillFuelEntry(
-  db: SQLiteDatabase,
+  db: WebsqlDatabase,
   quantity: number,
   date: Date,
 ) {
@@ -21,7 +21,7 @@ export async function fillFuelEntry(
 }
 
 export async function recordReading(
-  db: SQLiteDatabase,
+  db: WebsqlDatabase,
   reading: number,
   date: Date,
 ) {
@@ -39,7 +39,7 @@ export async function recordReading(
 }
 
 export async function saveUserInfo(
-  db: SQLiteDatabase,
+  db: WebsqlDatabase,
   name: string,
   initReading: number,
   price: number,

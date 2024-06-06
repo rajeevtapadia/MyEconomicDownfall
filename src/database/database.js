@@ -1,10 +1,7 @@
-import {enablePromise, openDatabase} from 'react-native-sqlite-storage';
-
-// Enable promise for SQLite
-enablePromise(true);
+import SQLite from 'react-native-sqlite-2'
 
 export const connectToDatabase = async () => {
-  return openDatabase(
+  return SQLite.openDatabase(
     {name: 'fuelConsumption.db', location: 'default'},
     () => {
       console.log('db connected');

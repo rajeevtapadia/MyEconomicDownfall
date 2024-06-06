@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Card, DefaultTheme, Paragraph, Text, Title} from 'react-native-paper';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {WebsqlDatabase} from 'react-native-sqlite-2'
 import {calcLatestFillAvg, calcOverallAvg} from '../utils/math';
 
 interface Props {
-  db: SQLiteDatabase;
+  db: WebsqlDatabase;
 }
 
 const StatsCard = ({db}: Props) => {

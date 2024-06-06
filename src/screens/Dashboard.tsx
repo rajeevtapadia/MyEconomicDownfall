@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Snackbar, Text, Button} from 'react-native-paper';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {WebsqlDatabase} from 'react-native-sqlite-2'
 import FuelEntryCard from '../components/FuelEntryCard';
 import MeterReadingCard from '../components/MeterReadingCard';
 import NavBar from '../components/NavBar';
@@ -19,7 +19,7 @@ const Dashboard = ({navigation}: props) => {
   const [snackbarMsg, setSnackbarMsg] = useState<string>(
     'jghkhjghjghjglhjlfg hg ',
   );
-  const [db, setDb] = useState<SQLiteDatabase | null>(null);
+  const [db, setDb] = useState<WebsqlDatabase | null>(null);
 
   const connectDB = useCallback(async () => {
     const connection = await connectToDatabase();

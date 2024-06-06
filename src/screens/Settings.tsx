@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {WebsqlDatabase} from 'react-native-sqlite-2'
 import NavBar from '../components/NavBar';
 import {saveUserInfo} from '../database/crud';
 import {connectToDatabase} from '../database/database';
@@ -12,7 +12,7 @@ const Settings = () => {
   const [initReading, setInitReading] = useState<number | null>(null);
   const [price, setPrice] = useState<number | null>(null);
 
-  const [db, setDb] = useState<SQLiteDatabase | null>(null);
+  const [db, setDb] = useState<WebsqlDatabase | null>(null);
 
   const connectDB = useCallback(async () => {
     const connection = await connectToDatabase();

@@ -1,6 +1,6 @@
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {WebsqlDatabase} from 'react-native-sqlite-2'
 
-export async function calcOverallAvg(db: SQLiteDatabase) {
+export async function calcOverallAvg(db: WebsqlDatabase) {
   try {
     const [fuelQuery] = await db.executeSql(
       `SELECT * FROM FuelQuantity ORDER BY date DESC;`,
@@ -38,7 +38,7 @@ export async function calcOverallAvg(db: SQLiteDatabase) {
 }
 
 // calculates the most recent fill's avg
-export async function calcLatestFillAvg(db: SQLiteDatabase): Promise<number> {
+export async function calcLatestFillAvg(db: WebsqlDatabase): Promise<number> {
   try {
     const [readingQuery] = await db.executeSql(`
       SELECT * FROM Reading ORDER BY date DESC;
@@ -72,7 +72,7 @@ export async function calcLatestFillAvg(db: SQLiteDatabase): Promise<number> {
 
 // calculates fuel consumption between a range of date
 export async function calcFillTill(
-  db: SQLiteDatabase,
+  db: WebsqlDatabase,
   start: string,
   end: string,
 ): Promise<number> {

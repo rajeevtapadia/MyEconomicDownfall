@@ -4,11 +4,11 @@ import DateTimePicker, {
 import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {WebsqlDatabase} from 'react-native-sqlite-2'
 import {fillFuelEntry} from '../database/crud';
 
 interface Props {
-  db: SQLiteDatabase;
+  db: WebsqlDatabase;
 }
 
 function FuelEntryCard({db}: Props) {

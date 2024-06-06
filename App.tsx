@@ -2,7 +2,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
 import {DefaultTheme, PaperProvider, Text} from 'react-native-paper';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {WebsqlDatabase} from 'react-native-sqlite-2'
 import {connectToDatabase, createTables} from './src/database/database';
 import Dashboard from './src/screens/Dashboard';
 import RecordScreen from './src/screens/RecordScreen';
@@ -11,7 +11,7 @@ import Settings from './src/screens/Settings';
 const Stack = createNativeStackNavigator();
 
 function App() {
-  const [db, setDb] = useState<SQLiteDatabase | null>(null);
+  const [db, setDb] = useState<WebsqlDatabase | null>(null);
 
   const darkTheme = {
     ...DefaultTheme,
