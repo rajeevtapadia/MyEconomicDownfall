@@ -1,7 +1,14 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Card, DefaultTheme, Paragraph, Text, Title} from 'react-native-paper';
-import {WebsqlDatabase} from 'react-native-sqlite-2'
+import {
+  Card,
+  DefaultTheme,
+  Paragraph,
+  Text,
+  Title,
+  IconButton,
+} from 'react-native-paper';
+import {WebsqlDatabase} from 'react-native-sqlite-2';
 import {calcLatestFillAvg, calcOverallAvg} from '../utils/math';
 
 interface Props {
@@ -12,21 +19,25 @@ const StatsCard = ({db}: Props) => {
   const [latestAvg, setLatestAvg] = useState<number>(NaN);
   const [overallAvg, setOverallAvg] = useState<number>(NaN);
 
-  useEffect(() => {
-    async function setValues() {
-      let avg = await calcLatestFillAvg(db);
-      setLatestAvg(avg);
-      avg = await calcOverallAvg(db);
-      setOverallAvg(avg);
-      // console.log({fun: await calcLatestFill(db, '2024-04-11 09:27:16')});
-    }
-    setValues();
+  const setValues = useCallback(async () => {
+    let avg = await calcLatestFillAvg(db);
+    setLatestAvg(avg);
+    avg = await calcOverallAvg(db);
+    setOverallAvg(avg);
   }, [db]);
+
+  useEffect(() => {
+    setValues();
+  }, [db, setValues]);
+  console.log('status card rendered');
 
   return (
     <Card style={styles.cardContainer}>
       <Card.Content>
-        <Title>Stats</Title>
+        <View style={styles.cardHeader}>
+          <Title>Stats</Title>
+          <IconButton style={styles.refreshButton} icon="refresh" size={22} onPress={setValues}></IconButton>
+        </View>
         <View style={styles.contentRow}>
           <View>
             <Paragraph>Latest Avg.</Paragraph>
@@ -51,6 +62,18 @@ const styles = StyleSheet.create({
     marginVertical: 16,
     backgroundColor: DefaultTheme.colors.primaryContainer,
     marginHorizontal: 10,
+  },
+  cardHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  refreshButton: {
+    position: 'relative',
+    top: -7,
+  },
+  border: {
+    borderWidth: 1,
   },
   contentRow: {
     flexDirection: 'row',
