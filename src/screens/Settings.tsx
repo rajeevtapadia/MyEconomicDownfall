@@ -1,18 +1,19 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {WebsqlDatabase} from 'react-native-sqlite-2';
 import NavBar from '../components/NavBar';
-import {saveUserInfo} from '../database/crud';
+import {saveUserInfo} from '../database/insert-queries';
 import {connectToDatabase} from '../database/database';
 import global from '../styles/global';
+import {getUserFromDB} from '../database/read-queries';
 
 const Settings = () => {
   const [name, setName] = useState<string>('');
   const [initReading, setInitReading] = useState<number | null>(null);
   const [price, setPrice] = useState<number | null>(null);
 
-  const [db, setDb] = useState<SQLiteDatabase | null>(null);
+  const [db, setDb] = useState<WebsqlDatabase | null>(null);
 
   const connectDB = useCallback(async () => {
     const connection = await connectToDatabase();
@@ -27,12 +28,11 @@ const Settings = () => {
   useEffect(() => {
     async function getUserData() {
       if (db) {
-        const [userData] = await db.executeSql(`SELECT * FROM User`);
-        const user = userData.rows.raw();
+        const user = await getUserFromDB(db);
         if (user.length > 0) {
-          setName(user[0].name);
-          setInitReading(user[0].initReading);
-          setPrice(user[0].price);
+          setName(user.item(0).name);
+          setInitReading(user.item(0).initReading);
+          setPrice(user.item(0).price);
         }
       }
     }

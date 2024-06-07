@@ -1,14 +1,14 @@
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Snackbar, Text, Button} from 'react-native-paper';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
+import {Button, Text} from 'react-native-paper';
+import {WebsqlDatabase} from 'react-native-sqlite-2';
 import FuelEntryCard from '../components/FuelEntryCard';
 import MeterReadingCard from '../components/MeterReadingCard';
 import NavBar from '../components/NavBar';
 import StatsCard from '../components/StatsCard';
 import {connectToDatabase} from '../database/database';
 import global from '../styles/global';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 interface props {
   navigation: NativeStackNavigationProp<any, any>;
@@ -19,11 +19,13 @@ const Dashboard = ({navigation}: props) => {
   const [snackbarMsg, setSnackbarMsg] = useState<string>(
     'jghkhjghjghjglhjlfg hg ',
   );
-  const [db, setDb] = useState<SQLiteDatabase | null>(null);
+  const [db, setDb] = useState<WebsqlDatabase | null>(null);
 
   const connectDB = useCallback(async () => {
     const connection = await connectToDatabase();
     setDb(connection);
+    // console.log(await getFuelQuantityFromDB(connection));
+    // console.log(await getUserFromDB(connection));
   }, []);
 
   useEffect(() => {

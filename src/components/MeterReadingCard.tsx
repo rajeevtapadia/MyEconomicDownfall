@@ -4,11 +4,11 @@ import DateTimePicker, {
 import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
-import {SQLiteDatabase} from 'react-native-sqlite-storage';
-import {recordReading} from '../database/crud';
+import {WebsqlDatabase} from 'react-native-sqlite-2'
+import {recordReading} from '../database/insert-queries';
 
 interface Props {
-  db: SQLiteDatabase;
+  db: WebsqlDatabase;
 }
 
 function MeterReadingCard({db}: Props) {
