@@ -4,31 +4,42 @@ import DateTimePicker, {
 import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
-import {WebsqlDatabase} from 'react-native-sqlite-2'
+import {WebsqlDatabase} from 'react-native-sqlite-2';
 import {recordReading} from '../database/insert-queries';
 
 interface Props {
   db: WebsqlDatabase;
+  setSnackbar: (value: boolean) => void;
+  setSnackbarMsg: (value: string) => void;
 }
 
-function MeterReadingCard({db}: Props) {
+function MeterReadingCard({db, setSnackbar, setSnackbarMsg}: Props) {
   const [reading, setReading] = useState<number | null>(null);
   const [date, setDate] = useState<Date | null>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const onSubmit = () => {
     if (!reading || !date) {
+      setSnackbarMsg('Please fill all fields');
+      setSnackbar(true);
+      setTimeout(() => {
+        setSnackbar(false);
+      }, 1000);
       return;
     }
     try {
       recordReading(db, reading, date);
+      setSnackbarMsg('Added Successfully');
+      setSnackbar(true);
     } catch (e) {
       console.error(e);
+      setSnackbarMsg('Error accessing database');
+      setSnackbar(true);
     }
   };
 
   const onChangeDate = (
-    event: DateTimePickerEvent,
+    _event: DateTimePickerEvent,
     selectedDate: Date | undefined,
   ) => {
     const currentDate = selectedDate || date;

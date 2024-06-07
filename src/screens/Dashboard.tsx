@@ -1,7 +1,7 @@
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Button, Text} from 'react-native-paper';
+import {Button, Snackbar, Text} from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2';
 import FuelEntryCard from '../components/FuelEntryCard';
 import MeterReadingCard from '../components/MeterReadingCard';
@@ -15,17 +15,13 @@ interface props {
 }
 
 const Dashboard = ({navigation}: props) => {
-  const [snackbar, setSnackbar] = useState<boolean>(true);
-  const [snackbarMsg, setSnackbarMsg] = useState<string>(
-    'jghkhjghjghjglhjlfg hg ',
-  );
+  const [snackbar, setSnackbar] = useState<boolean>(false);
+  const [snackbarMsg, setSnackbarMsg] = useState<string>('');
   const [db, setDb] = useState<WebsqlDatabase | null>(null);
 
   const connectDB = useCallback(async () => {
     const connection = await connectToDatabase();
     setDb(connection);
-    // console.log(await getFuelQuantityFromDB(connection));
-    // console.log(await getUserFromDB(connection));
   }, []);
 
   useEffect(() => {
@@ -42,8 +38,16 @@ const Dashboard = ({navigation}: props) => {
         <NavBar title="Dashboard" navigation={navigation} />
         <StatsCard db={db} />
         <View>
-          <FuelEntryCard db={db} />
-          <MeterReadingCard db={db} />
+          <FuelEntryCard
+            db={db}
+            setSnackbar={setSnackbar}
+            setSnackbarMsg={setSnackbarMsg}
+          />
+          <MeterReadingCard
+            db={db}
+            setSnackbar={setSnackbar}
+            setSnackbarMsg={setSnackbarMsg}
+          />
         </View>
       </View>
       <Button
@@ -53,29 +57,17 @@ const Dashboard = ({navigation}: props) => {
         }}>
         History
       </Button>
-      {/* <View style={styles.snackbarContainer}>
-        <Snackbar
-          visible={snackbar}
-          onDismiss={() => {
-            setSnackbar(false);
-            setSnackbarMsg('');
-          }}>
-          {snackbarMsg}
-        </Snackbar>
-      </View> */}
+      <Snackbar
+        visible={snackbar}
+        onDismiss={() => {
+          setSnackbar(false);
+          setSnackbarMsg('');
+        }}
+        duration={1000}>
+        {snackbarMsg}
+      </Snackbar>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  snackbarContainer: {
-    flex: 1,
-    justifyContent: 'space-between',
-    maxHeight: 45,
-    borderRadius: 10,
-    marginBottom: 10,
-    marginHorizontal: 5,
-  },
-});
 
 export default Dashboard;

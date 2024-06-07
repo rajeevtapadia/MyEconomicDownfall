@@ -5,6 +5,8 @@ import {
   getUserFromDB,
 } from '../database/read-queries';
 
+// these functions may throw error, handling needs to be done
+
 export async function calcOverallAvg(db: WebsqlDatabase): Promise<number> {
   try {
     const readingData = await getReadingsFromDB(db);
@@ -30,8 +32,8 @@ export async function calcOverallAvg(db: WebsqlDatabase): Promise<number> {
 
     return totalDistance;
   } catch (error) {
-    console.log('error in calcOverAll function', error);
-    return NaN;
+    console.error('error in calcOverAll function', error);
+    throw error;
   }
 }
 
@@ -67,8 +69,8 @@ export async function calcLatestFillAvg(db: WebsqlDatabase) {
 
     return latestFillAvg;
   } catch (error) {
-    console.log('error in calcLatestFillAvg function', error);
-    return NaN;
+    console.error('error in calcLatestFillAvg function', error);
+    throw error;
   }
 }
 
@@ -93,6 +95,6 @@ export async function calcFillInInterval(
     return sum;
   } catch (e) {
     console.error('error in calcFillTill function', e);
-    return NaN;
+    throw e;
   }
 }

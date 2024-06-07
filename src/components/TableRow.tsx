@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
-import global from '../styles/global';
 
 interface props {
   readings: Reading[];
@@ -16,8 +15,6 @@ const TableRow = ({readings, quantity, index, user}: props) => {
   );
   const [fills, setFills] = useState<Quantity[]>([]);
   const [run, setRun] = useState<number>(NaN);
-
-  console.log({prevReading});
 
   // effect to find prevReading
   useEffect(() => {
@@ -44,7 +41,6 @@ const TableRow = ({readings, quantity, index, user}: props) => {
       }
     }
     setFills(requiredRec);
-    console.log(requiredRec);
   }, [index, prevReading, quantity, readings]);
 
   return (

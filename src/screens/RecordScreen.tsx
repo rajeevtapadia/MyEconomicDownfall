@@ -15,7 +15,7 @@ const RecordScreen = () => {
   const [db, setDb] = useState<WebsqlDatabase | null>(null);
   const [readings, setReadings] = useState<Reading[]>([]);
   const [quantity, setQuantity] = useState<Quantity[]>([]);
-  const [user, setUser] = useState<User>({});
+  const [user, setUser] = useState<User | null>(null);
 
   const connectDB = useCallback(async () => {
     const connection = await connectToDatabase();
@@ -33,21 +33,21 @@ const RecordScreen = () => {
         const readingData = await getReadingsFromDB(db);
         const quantityData = await getFuelQuantityFromDB(db);
         const userData = await getUserFromDB(db);
-        // console.log(readingData.item(0))
-        // console.log(quantityData.item(0));
         const readingArr = [];
+
         for (let i = 0; i < readingData.length; i++) {
           readingArr.push(readingData.item(i));
         }
         const quantityArr = [];
-        for(let i = 0; i < quantityData.length; i++) {
+        for (let i = 0; i < quantityData.length; i++) {
           quantityArr.push(quantityData.item(i));
         }
 
         setReadings(readingArr);
         setQuantity(quantityArr);
-        setUser(userData.item(0));
-        // console.log(readings);
+        if (userData.length > 0) {
+          setUser(userData.item(0));
+        }
       }
     }
     fetchRecords();
@@ -55,9 +55,9 @@ const RecordScreen = () => {
 
   if (!db) {
     return <Text>Database error</Text>;
+  } else if (user === null) {
+    return <Text>First complete your profile in settings</Text>;
   }
-  // console.log({readings, quantity});
-  // console.log(readings.length, quantity.length)
 
   if (readings?.length && quantity?.length) {
     return (
@@ -73,7 +73,6 @@ const RecordScreen = () => {
             </View>
           </View>
           {readings.map((_, i) => {
-            console.log(_);
             return (
               <TableRow
                 key={_.id}

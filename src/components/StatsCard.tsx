@@ -13,30 +13,41 @@ import {calcLatestFillAvg, calcOverallAvg} from '../utils/math';
 
 interface Props {
   db: WebsqlDatabase;
+  setSnackbar: (value: boolean) => void;
+  setSnackbarMsg: (value: string) => void;
 }
 
-const StatsCard = ({db}: Props) => {
+const StatsCard = ({db, setSnackbar, setSnackbarMsg}: Props) => {
   const [latestAvg, setLatestAvg] = useState<number>(NaN);
   const [overallAvg, setOverallAvg] = useState<number>(NaN);
 
   const setValues = useCallback(async () => {
-    let avg = await calcLatestFillAvg(db);
-    setLatestAvg(avg);
-    avg = await calcOverallAvg(db);
-    setOverallAvg(avg);
+    try {
+      let avg = await calcLatestFillAvg(db);
+      setLatestAvg(avg);
+      avg = await calcOverallAvg(db);
+      setOverallAvg(avg);
+    } catch (e) {
+      console.error(e);
+      setSnackbarMsg('Error calculating stats file a bug report');
+      setSnackbar(true);
+    }
   }, [db]);
 
   useEffect(() => {
     setValues();
   }, [db, setValues]);
-  console.log('status card rendered');
 
   return (
     <Card style={styles.cardContainer}>
       <Card.Content>
         <View style={styles.cardHeader}>
           <Title>Stats</Title>
-          <IconButton style={styles.refreshButton} icon="refresh" size={22} onPress={setValues}></IconButton>
+          <IconButton
+            style={styles.refreshButton}
+            icon="refresh"
+            size={22}
+            onPress={setValues}></IconButton>
         </View>
         <View style={styles.contentRow}>
           <View>

@@ -1,17 +1,20 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Button, Text, TextInput} from 'react-native-paper';
+import {Button, Snackbar, Text, TextInput} from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2';
 import NavBar from '../components/NavBar';
-import {saveUserInfo} from '../database/insert-queries';
 import {connectToDatabase} from '../database/database';
-import global from '../styles/global';
+import {saveUserInfo} from '../database/insert-queries';
 import {getUserFromDB} from '../database/read-queries';
+import global from '../styles/global';
 
 const Settings = () => {
   const [name, setName] = useState<string>('');
   const [initReading, setInitReading] = useState<number | null>(null);
   const [price, setPrice] = useState<number | null>(null);
+
+  const [snackbar, setSnackbar] = useState<boolean>(false);
+  const [snackbarMsg, setSnackbarMsg] = useState<string>('');
 
   const [db, setDb] = useState<WebsqlDatabase | null>(null);
 
@@ -47,10 +50,13 @@ const Settings = () => {
     try {
       if (db && initReading !== null && price !== null && name !== '') {
         saveUserInfo(db, name, initReading, price);
+        setSnackbarMsg('Details saved successfully');
+        setSnackbar(true);
       }
     } catch (e) {
-      // todo: show snackbar for error
-      console.log(e);
+      console.error(e);
+      setSnackbarMsg('Error accessing database');
+      setSnackbar(true);
     }
   }
 
@@ -64,7 +70,6 @@ const Settings = () => {
             mode="outlined"
             textColor="white"
             value={name}
-            style={styles.quantity}
             onChangeText={text => {
               setName(text);
             }}
@@ -73,9 +78,8 @@ const Settings = () => {
             label="Initial Reading"
             mode="outlined"
             textColor="white"
-            value={initReading ? initReading.toString() : undefined}
+            value={initReading !== null ? initReading.toString() : undefined}
             keyboardType="numeric"
-            style={styles.quantity}
             onChangeText={text => {
               setInitReading(+text);
             }}
@@ -84,9 +88,8 @@ const Settings = () => {
             label="Price"
             mode="outlined"
             textColor="white"
-            value={price ? price.toString() : undefined}
+            value={price !== null ? price.toString() : undefined}
             keyboardType="numeric"
-            style={styles.quantity}
             onChangeText={text => {
               setPrice(+text);
             }}
@@ -99,6 +102,15 @@ const Settings = () => {
           </Button>
         </View>
       </View>
+      <Snackbar
+        visible={snackbar}
+        onDismiss={() => {
+          setSnackbar(false);
+          setSnackbarMsg('');
+        }}
+        duration={1000}>
+        {snackbarMsg}
+      </Snackbar>
     </View>
   );
 };
@@ -107,7 +119,6 @@ const styles = StyleSheet.create({
   container: {
     padding: 8,
   },
-  quantity: {},
   button: {
     maxWidth: 100,
     marginTop: 8,
