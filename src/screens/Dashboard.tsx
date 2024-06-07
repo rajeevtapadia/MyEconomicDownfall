@@ -1,6 +1,6 @@
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {View} from 'react-native';
 import {Button, Snackbar, Text} from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2';
 import FuelEntryCard from '../components/FuelEntryCard';
@@ -36,7 +36,11 @@ const Dashboard = ({navigation}: props) => {
     <View style={global.window}>
       <View>
         <NavBar title="Dashboard" navigation={navigation} />
-        <StatsCard db={db} />
+        <StatsCard
+          db={db}
+          setSnackbar={setSnackbar}
+          setSnackbarMsg={setSnackbarMsg}
+        />
         <View>
           <FuelEntryCard
             db={db}
