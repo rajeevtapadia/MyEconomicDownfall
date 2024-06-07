@@ -24,7 +24,8 @@ const NavBar = ({title, navigation}: props) => {
 
 const styles = StyleSheet.create({
   navContainer: {
-    padding: 10,
+    padding: 5,
+    minHeight: 60,
     backgroundColor: '#303030',
     width: '100%',
     display: 'flex',

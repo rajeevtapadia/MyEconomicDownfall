@@ -1,10 +1,15 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
-import {WebsqlDatabase} from 'react-native-sqlite-2'
+import {WebsqlDatabase} from 'react-native-sqlite-2';
 import NavBar from '../components/NavBar';
 import TableRow from '../components/TableRow';
 import {connectToDatabase} from '../database/database';
+import {
+  getFuelQuantityFromDB,
+  getReadingsFromDB,
+  getUserFromDB,
+} from '../database/read-queries';
 
 const RecordScreen = () => {
   const [db, setDb] = useState<WebsqlDatabase | null>(null);
@@ -25,18 +30,24 @@ const RecordScreen = () => {
   useEffect(() => {
     async function fetchRecords() {
       if (db) {
-        const [readingData] = await db.executeSql(
-          `select * from Reading ORDER BY date DESC`,
-        );
-        setReadings(readingData.rows.raw());
+        const readingData = await getReadingsFromDB(db);
+        const quantityData = await getFuelQuantityFromDB(db);
+        const userData = await getUserFromDB(db);
+        // console.log(readingData.item(0))
+        // console.log(quantityData.item(0));
+        const readingArr = [];
+        for (let i = 0; i < readingData.length; i++) {
+          readingArr.push(readingData.item(i));
+        }
+        const quantityArr = [];
+        for(let i = 0; i < quantityData.length; i++) {
+          quantityArr.push(quantityData.item(i));
+        }
 
-        const [quantityData] = await db.executeSql(
-          `select * from FuelQuantity ORDER BY date DESC`,
-        );
-        setQuantity(quantityData.rows.raw());
-
-        const [userData] = await db.executeSql(`SELECT * FROM User`);
-        setUser(userData.rows.raw()[0]);
+        setReadings(readingArr);
+        setQuantity(quantityArr);
+        setUser(userData.item(0));
+        // console.log(readings);
       }
     }
     fetchRecords();
@@ -45,7 +56,8 @@ const RecordScreen = () => {
   if (!db) {
     return <Text>Database error</Text>;
   }
-  console.log({readings, quantity});
+  // console.log({readings, quantity});
+  // console.log(readings.length, quantity.length)
 
   if (readings?.length && quantity?.length) {
     return (
@@ -61,6 +73,7 @@ const RecordScreen = () => {
             </View>
           </View>
           {readings.map((_, i) => {
+            console.log(_);
             return (
               <TableRow
                 key={_.id}
@@ -75,7 +88,7 @@ const RecordScreen = () => {
       </View>
     );
   } else {
-    return <Text>Loading..</Text>;
+    return <Text>No Data..</Text>;
   }
 };
 
