@@ -1,11 +1,12 @@
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2';
 import {fillFuelEntry} from '../../database/insert-queries';
+import {databaseContext} from '../../context/databaseContext';
 
 interface Props {
   db: WebsqlDatabase;
@@ -17,6 +18,12 @@ function FuelEntryCard({db, setSnackbar, setSnackbarMsg}: Props) {
   const [quantity, setQuantity] = useState<number | null>(null);
   const [date, setDate] = useState<Date | null>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const contextData = useContext(databaseContext);
+  if (!contextData) {
+    throw new Error('Context getting fetched...');
+  }
+  const {setQuantity: setQuantityInContext} = contextData;
 
   const onSubmit = () => {
     if (!quantity || !date) {

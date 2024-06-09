@@ -1,13 +1,12 @@
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {View} from 'react-native';
 import {Button, Snackbar, Text} from 'react-native-paper';
-import {WebsqlDatabase} from 'react-native-sqlite-2';
+import NavBar from '../components/NavBar';
 import FuelEntryCard from '../components/dashboard/FuelEntryCard';
 import MeterReadingCard from '../components/dashboard/MeterReadingCard';
-import NavBar from '../components/NavBar';
 import StatsCard from '../components/dashboard/StatsCard';
-import {connectToDatabase} from '../database/database';
+import {databaseContext} from '../context/databaseContext';
 import global from '../styles/global';
 
 interface props {
@@ -17,16 +16,13 @@ interface props {
 const Dashboard = ({navigation}: props) => {
   const [snackbar, setSnackbar] = useState<boolean>(false);
   const [snackbarMsg, setSnackbarMsg] = useState<string>('');
-  const [db, setDb] = useState<WebsqlDatabase | null>(null);
+  // const [db, setDb] = useState<WebsqlDatabase | null>(null);
 
-  const connectDB = useCallback(async () => {
-    const connection = await connectToDatabase();
-    setDb(connection);
-  }, []);
-
-  useEffect(() => {
-    connectDB();
-  }, [connectDB]);
+  const contextData = useContext(databaseContext);
+  if (!contextData) {
+    return <Text> context getting fetched...</Text>;
+  }
+  const {db} = contextData;
 
   if (!db) {
     return <Text>Db not connected...</Text>;

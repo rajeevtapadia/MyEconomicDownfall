@@ -1,15 +1,16 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {
   Card,
   DefaultTheme,
+  IconButton,
   Paragraph,
   Text,
   Title,
-  IconButton,
 } from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2';
-import {calcLatestFillAvg, calcOverallAvg} from '../../utils/math';
+import {databaseContext} from '../../context/databaseContext';
+import {calcLatestFillAvgNew, calcOverallAvgNew} from '../../utils/math';
 
 interface Props {
   db: WebsqlDatabase;
@@ -20,24 +21,23 @@ interface Props {
 const StatsCard = ({db, setSnackbar, setSnackbarMsg}: Props) => {
   const [latestAvg, setLatestAvg] = useState<number>(NaN);
   const [overallAvg, setOverallAvg] = useState<number>(NaN);
+  const contextData = useContext(databaseContext);
+  if (!contextData) {
+    throw new Error('Context getting fetched...');
+  }
+  const {readings, quantity, userTable} = contextData;
+  // console.log(readings, quantity)
 
   const setValues = useCallback(async () => {
-    try {
-      let avg = await calcLatestFillAvg(db);
-      setLatestAvg(avg);
-      avg = await calcOverallAvg(db);
-      setOverallAvg(avg);
-    } catch (e) {
-      console.error(e);
-      setSnackbarMsg('Error calculating stats file a bug report');
-      setSnackbar(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [db]);
+    let avg = calcLatestFillAvgNew(readings, quantity, userTable);
+    setLatestAvg(avg);
 
+    avg = calcOverallAvgNew(readings, quantity, userTable);
+    setOverallAvg(avg);
+  }, [quantity, readings, userTable]);
   useEffect(() => {
     setValues();
-  }, [db, setValues]);
+  }, [db, readings, quantity, userTable, setValues]);
 
   return (
     <Card style={styles.cardContainer}>
