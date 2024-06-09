@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {GestureResponderEvent, StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
 
 interface props {
@@ -7,9 +7,11 @@ interface props {
   quantity: Quantity[];
   index: number;
   user: User;
+  readingId: number;
+  navigation: NativeStackNavigationProp<any, any>;
 }
 
-const TableRow = ({readings, quantity, index, user}: props) => {
+const TableRow = ({readings, quantity, index, user, navigation, readingId}: props) => {
   const [prevReading, setPrevReading] = useState<string>(
     new Date(0).toISOString(),
   );

@@ -3,10 +3,10 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {Button, Snackbar, Text} from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2';
-import FuelEntryCard from '../components/FuelEntryCard';
-import MeterReadingCard from '../components/MeterReadingCard';
+import FuelEntryCard from '../components/dashboard/FuelEntryCard';
+import MeterReadingCard from '../components/dashboard/MeterReadingCard';
 import NavBar from '../components/NavBar';
-import StatsCard from '../components/StatsCard';
+import StatsCard from '../components/dashboard/StatsCard';
 import {connectToDatabase} from '../database/database';
 import global from '../styles/global';
 

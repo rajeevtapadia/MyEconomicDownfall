@@ -5,7 +5,7 @@ import React, {useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2';
-import {recordReading} from '../database/insert-queries';
+import {fillFuelEntry} from '../../database/insert-queries';
 
 interface Props {
   db: WebsqlDatabase;
@@ -13,22 +13,19 @@ interface Props {
   setSnackbarMsg: (value: string) => void;
 }
 
-function MeterReadingCard({db, setSnackbar, setSnackbarMsg}: Props) {
-  const [reading, setReading] = useState<number | null>(null);
+function FuelEntryCard({db, setSnackbar, setSnackbarMsg}: Props) {
+  const [quantity, setQuantity] = useState<number | null>(null);
   const [date, setDate] = useState<Date | null>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const onSubmit = () => {
-    if (!reading || !date) {
+    if (!quantity || !date) {
       setSnackbarMsg('Please fill all fields');
       setSnackbar(true);
-      setTimeout(() => {
-        setSnackbar(false);
-      }, 1000);
       return;
     }
     try {
-      recordReading(db, reading, date);
+      fillFuelEntry(db, quantity, date);
       setSnackbarMsg('Added Successfully');
       setSnackbar(true);
     } catch (e) {
@@ -49,24 +46,24 @@ function MeterReadingCard({db, setSnackbar, setSnackbarMsg}: Props) {
 
   return (
     <View style={styles.container}>
-      <Text>Meter Reading</Text>
+      <Text>Fuel Entry</Text>
       <View style={styles.row}>
         <TextInput
-          label="Reading"
+          label="Quantity"
           mode="outlined"
           textColor="white"
           keyboardType="numeric"
-          style={styles.reading}
+          style={styles.quantity}
           onChangeText={text => {
-            setReading(+text);
+            setQuantity(+text);
           }}
         />
 
         <TextInput
           label="Date"
           value={date ? date.toLocaleDateString() : ''}
-          mode="outlined"
           textColor="white"
+          mode="outlined"
           style={styles.date}
           onTouchEnd={() => {
             setShowDatePicker(true);
@@ -96,7 +93,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  reading: {
+  quantity: {
     flex: 1,
     marginRight: 3,
   },
@@ -110,4 +107,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MeterReadingCard;
+export default FuelEntryCard;

@@ -9,7 +9,7 @@ import {
   IconButton,
 } from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2';
-import {calcLatestFillAvg, calcOverallAvg} from '../utils/math';
+import {calcLatestFillAvg, calcOverallAvg} from '../../utils/math';
 
 interface Props {
   db: WebsqlDatabase;
@@ -32,6 +32,7 @@ const StatsCard = ({db, setSnackbar, setSnackbarMsg}: Props) => {
       setSnackbarMsg('Error calculating stats file a bug report');
       setSnackbar(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [db]);
 
   useEffect(() => {
