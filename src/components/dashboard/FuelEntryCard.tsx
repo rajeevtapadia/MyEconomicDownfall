@@ -7,6 +7,7 @@ import {Button, Text, TextInput} from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2';
 import {fillFuelEntry} from '../../database/insert-queries';
 import {databaseContext} from '../../context/databaseContext';
+import {getFuelQuantityFromDB} from '../../database/read-queries';
 
 interface Props {
   db: WebsqlDatabase;
@@ -14,7 +15,7 @@ interface Props {
   setSnackbarMsg: (value: string) => void;
 }
 
-function FuelEntryCard({db, setSnackbar, setSnackbarMsg}: Props) {
+function FuelEntryCard({setSnackbar, setSnackbarMsg}: Props) {
   const [quantity, setQuantity] = useState<number | null>(null);
   const [date, setDate] = useState<Date | null>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -23,9 +24,9 @@ function FuelEntryCard({db, setSnackbar, setSnackbarMsg}: Props) {
   if (!contextData) {
     throw new Error('Context getting fetched...');
   }
-  const {setQuantity: setQuantityInContext} = contextData;
+  const {db, setQuantity: setQuantityInContext} = contextData;
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!quantity || !date) {
       setSnackbarMsg('Please fill all fields');
       setSnackbar(true);
@@ -35,6 +36,13 @@ function FuelEntryCard({db, setSnackbar, setSnackbarMsg}: Props) {
       fillFuelEntry(db, quantity, date);
       setSnackbarMsg('Added Successfully');
       setSnackbar(true);
+      // Update the context with the new quantity
+      const quantityData = await getFuelQuantityFromDB(db);
+      const quantityArr = [];
+      for (let i = 0; i < quantityData.length; i++) {
+        quantityArr.push(quantityData.item(i));
+      }
+      setQuantityInContext(quantityArr);
     } catch (e) {
       console.error(e);
       setSnackbarMsg('Error accessing database');

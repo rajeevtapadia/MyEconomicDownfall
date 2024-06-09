@@ -1,11 +1,13 @@
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2';
 import {recordReading} from '../../database/insert-queries';
+import {getReadingsFromDB} from '../../database/read-queries';
+import {databaseContext} from '../../context/databaseContext';
 
 interface Props {
   db: WebsqlDatabase;
@@ -13,12 +15,18 @@ interface Props {
   setSnackbarMsg: (value: string) => void;
 }
 
-function MeterReadingCard({db, setSnackbar, setSnackbarMsg}: Props) {
+function MeterReadingCard({setSnackbar, setSnackbarMsg}: Props) {
   const [reading, setReading] = useState<number | null>(null);
   const [date, setDate] = useState<Date | null>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const contextData = useContext(databaseContext);
+  if (!contextData) {
+    throw new Error('Context getting fetched...');
+  }
+  const {db, setReadings: setReadingsInContext, readings} = contextData;
+  console.log({readings});
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!reading || !date) {
       setSnackbarMsg('Please fill all fields');
       setSnackbar(true);
@@ -31,6 +39,13 @@ function MeterReadingCard({db, setSnackbar, setSnackbarMsg}: Props) {
       recordReading(db, reading, date);
       setSnackbarMsg('Added Successfully');
       setSnackbar(true);
+      // Update the context with the new quantity
+      const readingData = await getReadingsFromDB(db);
+      const readingArr = [];
+      for (let i = 0; i < readingData.length; i++) {
+        readingArr.push(readingData.item(i));
+      }
+      setReadingsInContext(readingArr);
     } catch (e) {
       console.error(e);
       setSnackbarMsg('Error accessing database');
