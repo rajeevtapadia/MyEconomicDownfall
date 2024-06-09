@@ -10,12 +10,20 @@ const NavBar = ({title, navigation}: props) => {
   return (
     <View style={styles.navContainer}>
       <Text style={styles.text}>{title}</Text>
-      {navigation && (
+      {title === 'Dashboard' && (
         <IconButton
           icon="account-settings"
           iconColor={MD3Colors.error50}
           size={30}
           onPress={() => navigation.navigate('settings')}
+        />
+      )}
+      {title === 'History' && (
+        <IconButton
+          icon="square-edit-outline"
+          iconColor={MD3Colors.error50}
+          size={30}
+          onPress={() => navigation.navigate('edit')}
         />
       )}
     </View>

@@ -1,9 +1,9 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
 import {WebsqlDatabase} from 'react-native-sqlite-2';
 import NavBar from '../components/NavBar';
-import TableRow from '../components/TableRow';
+import TableRow from '../components/history/TableRow';
 import {connectToDatabase} from '../database/database';
 import {
   getFuelQuantityFromDB,
@@ -11,7 +11,11 @@ import {
   getUserFromDB,
 } from '../database/read-queries';
 
-const RecordScreen = () => {
+interface props {
+  navigation: NativeStackNavigationProp<any, any>;
+}
+
+const RecordScreen = ({navigation}: props) => {
   const [db, setDb] = useState<WebsqlDatabase | null>(null);
   const [readings, setReadings] = useState<Reading[]>([]);
   const [quantity, setQuantity] = useState<Quantity[]>([]);
@@ -62,8 +66,8 @@ const RecordScreen = () => {
   if (readings?.length && quantity?.length) {
     return (
       <View style={styles.window}>
-        <NavBar title="History" />
-        <View>
+        <NavBar title="History" navigation={navigation} />
+        <ScrollView>
           <View style={styles.container}>
             <View style={styles.left}>
               <Text style={styles.text}>Fills</Text>
@@ -80,11 +84,13 @@ const RecordScreen = () => {
                 quantity={quantity}
                 index={i}
                 user={user}
+                readingId={_.id}
+                navigation={navigation}
               />
             );
           })}
+      </ScrollView>
         </View>
-      </View>
     );
   } else {
     return <Text>No Data..</Text>;
