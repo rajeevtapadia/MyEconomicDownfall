@@ -1,6 +1,7 @@
 import {View, StyleSheet} from 'react-native';
 import {Text} from 'react-native-paper';
 import React from 'react';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 interface props {
   readings: Reading[];

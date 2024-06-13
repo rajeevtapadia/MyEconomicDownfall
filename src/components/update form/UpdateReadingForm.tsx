@@ -1,14 +1,14 @@
 import DateTimePicker, {
   DateTimePickerEvent,
 } from '@react-native-community/datetimepicker';
-import React, {useState} from 'react';
-import {View, StyleSheet} from 'react-native';
+import React, {useContext, useState} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {Button, TextInput} from 'react-native-paper';
-import {WebsqlDatabase} from 'react-native-sqlite-2';
+import {databaseContext} from '../../context/databaseContext';
+import {deleteReadingInDB} from '../../database/delete-queries';
 import {updateReadingInDB} from '../../database/update-queries';
 
 interface props {
-  db: WebsqlDatabase;
   reading: Reading;
   setReading: React.Dispatch<React.SetStateAction<Reading | null>>;
   setSnackbar: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,25 +16,57 @@ interface props {
 }
 
 const UpdateReadingForm = ({
-  db,
-  reading,
-  setReading,
+  reading: readingItem,
+  setReading: setReadingItem,
   setSnackbar,
   setSnackbarMsg,
 }: props) => {
   const [date, setDate] = useState<Date | null>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
 
+  const contextData = useContext(databaseContext);
+  if (!contextData) {
+    throw new Error('Context getting fetched...');
+  }
+  const {db, readings, setReadings} = contextData;
+
   const onSubmit = () => {
-    if (!reading || !date) {
+    if (!readingItem || !date) {
       setSnackbarMsg('Please fill all fields');
       setSnackbar(true);
       return;
     }
     try {
-      updateReadingInDB(db, reading);
+      // update the reading in the database
+      updateReadingInDB(db, readingItem);
       setSnackbarMsg('Added Successfully');
       setSnackbar(true);
+
+      // update the state of the reading in context
+      const newReadings = readings.map(item => {
+        if (item.id === readingItem.id) {
+          return readingItem;
+        }
+        return item;
+      });
+      setReadings(newReadings);
+    } catch (e) {
+      console.error(e);
+      setSnackbarMsg('Error accessing database');
+      setSnackbar(true);
+    }
+  };
+
+  const onDelete = () => {
+    try {
+      // delete the reading in the database
+      deleteReadingInDB(db, readingItem);
+      setSnackbarMsg('Deleted Successfully');
+      setSnackbar(true);
+
+      // update the state of the reading in context
+      const newReadings = readings.filter(item => item.id !== readingItem.id);
+      setReadings(newReadings);
     } catch (e) {
       console.error(e);
       setSnackbarMsg('Error accessing database');
@@ -57,13 +89,13 @@ const UpdateReadingForm = ({
         <TextInput
           label="Reading"
           mode="outlined"
-          value={reading.meterReading.toString()}
+          value={readingItem.meterReading.toString()}
           textColor="white"
           keyboardType="numeric"
           // style={styles.quantity}
           onChangeText={text => {
-            const newReading = {...reading, meterReading: +text};
-            setReading(newReading);
+            const newReading = {...readingItem, meterReading: +text};
+            setReadingItem(newReading);
           }}
         />
         <TextInput
@@ -85,9 +117,14 @@ const UpdateReadingForm = ({
           />
         )}
       </View>
-      <Button mode="contained-tonal" style={styles.button} onPress={onSubmit}>
-        Save
-      </Button>
+      <View>
+        <Button mode="contained-tonal" style={styles.button} onPress={onSubmit}>
+          Save
+        </Button>
+        <Button mode="contained-tonal" style={styles.button} onPress={onDelete}>
+          Delete
+        </Button>
+      </View>
     </View>
   );
 };

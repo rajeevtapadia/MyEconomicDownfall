@@ -1,11 +1,10 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Snackbar, Text} from 'react-native-paper';
-import {WebsqlDatabase} from 'react-native-sqlite-2';
 import NavBar from '../components/NavBar';
 import UpdateQuantityForm from '../components/update form/UpdateQuantityForm';
 import UpdateReadingForm from '../components/update form/UpdateReadingForm';
-import {connectToDatabase} from '../database/database';
+import {databaseContext} from '../context/databaseContext';
 
 interface props {
   route: any;
@@ -17,16 +16,11 @@ const UpdateScreen = ({route}: props) => {
 
   const [snackbar, setSnackbar] = useState<boolean>(false);
   const [snackbarMsg, setSnackbarMsg] = useState<string>('');
-  const [db, setDb] = useState<WebsqlDatabase | null>(null);
-  ('');
-  const connectDB = useCallback(async () => {
-    const connection = await connectToDatabase();
-    setDb(connection);
-  }, []);
-
-  useEffect(() => {
-    connectDB();
-  }, [connectDB]);
+  const contextData = useContext(databaseContext);
+  if (!contextData) {
+    throw new Error('Context getting fetched...');
+  }
+  const {db} = contextData;
 
   useEffect(() => {
     if (route.params.fill) {
@@ -45,7 +39,6 @@ const UpdateScreen = ({route}: props) => {
       <NavBar title="Update Entry" />
       {quantity && (
         <UpdateQuantityForm
-          db={db}
           quantity={quantity}
           setQuantity={setQuantity}
           setSnackbar={setSnackbar}
@@ -54,7 +47,6 @@ const UpdateScreen = ({route}: props) => {
       )}
       {reading && (
         <UpdateReadingForm
-          db={db}
           reading={reading}
           setReading={setReading}
           setSnackbar={setSnackbar}
