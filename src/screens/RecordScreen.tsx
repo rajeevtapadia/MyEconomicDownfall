@@ -1,10 +1,10 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import React, {useContext, useEffect, useState} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
-import {WebsqlDatabase} from 'react-native-sqlite-2';
 import NavBar from '../components/NavBar';
 import TableRow from '../components/history/TableRow';
-import {connectToDatabase} from '../database/database';
+import {databaseContext} from '../context/databaseContext';
 import {
   getFuelQuantityFromDB,
   getReadingsFromDB,
@@ -16,19 +16,13 @@ interface props {
 }
 
 const RecordScreen = ({navigation}: props) => {
-  const [db, setDb] = useState<WebsqlDatabase | null>(null);
-  const [readings, setReadings] = useState<Reading[]>([]);
-  const [quantity, setQuantity] = useState<Quantity[]>([]);
   const [user, setUser] = useState<User | null>(null);
 
-  const connectDB = useCallback(async () => {
-    const connection = await connectToDatabase();
-    setDb(connection);
-  }, []);
-
-  useEffect(() => {
-    connectDB();
-  }, [connectDB]);
+  const contextData = useContext(databaseContext);
+  if (contextData === null) {
+    throw new Error('Context getting fetched...');
+  }
+  const {db, readings, quantity, setReadings, setQuantity} = contextData;
 
   // effect to fetch data from db
   useEffect(() => {
@@ -55,12 +49,20 @@ const RecordScreen = ({navigation}: props) => {
       }
     }
     fetchRecords();
-  }, [db]);
+  }, [db, setQuantity, setReadings]);
 
   if (!db) {
-    return <Text>Database error</Text>;
+    return (
+      <View style={styles.window}>
+        <Text>Database error</Text>
+      </View>
+    );
   } else if (user === null) {
-    return <Text>First complete your profile in settings</Text>;
+    return (
+      <View style={styles.window}>
+        <Text>First complete your profile in settings</Text>
+      </View>
+    );
   }
 
   if (readings?.length && quantity?.length) {
@@ -89,11 +91,15 @@ const RecordScreen = ({navigation}: props) => {
               />
             );
           })}
-      </ScrollView>
-        </View>
+        </ScrollView>
+      </View>
     );
   } else {
-    return <Text>No Data..</Text>;
+    return (
+      <View style={styles.window}>
+        <Text style={styles.text}>No data..</Text>
+      </View>
+    )
   }
 };
 
