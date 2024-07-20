@@ -9,8 +9,7 @@
 7. Repeat 4.
 
 ### Some of the known issues are
-1. No functionality to modify records (will be fixed in next version)
-2. No feature to take backup of your data. If app is deleted data will be lost.
+1. No feature to take backup of your data. If app is deleted data will be lost.
 3. No testing done on any platform other than android.
 
 Suggestions or PRs appreciated :)
